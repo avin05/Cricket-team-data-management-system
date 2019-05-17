@@ -1,0 +1,85 @@
+Queries:
+1. update batsman_stats set runs = '" + jTextField4.getText()+ "', balls = '" + jTextField1.getText() + "',fours = '" + jTextField6.getText() + "',sixes = '" + jTextField7.getText() + "',strike_rate = '" +jTextField2.getText()+"' where player_id = '" + jTextField3.getText() +"' && match_no = '" + jTextField5.getText() + 
+2.select * from batsman_stats where player_id = ? && match_no = ?
+3.insert into batsman_stats values('"+jTextField5.getText()+"','" + jTextField3.getText()+ "','" +jTextField4.getText()+"','" +jTextField1.getText()+ "','" + jTextField6.getText()+"','"+jTextField7.getText()+"','" + jTextField2.getText() + "')
+4.delete from batsman_stats where player_id = '" + jTextField3.getText() + "'&& match_no ='" + jTextField5.getText() +"'
+5.insert into result values('"+jTextField6.getText()+"','" + jTextField7.getText()+ "','" +jTextField5.getText()+"')
+6.update result set result = '" + jTextField7.getText()+ "', points = '" + jTextField5.getText() + "' where match_no = '" + jTextField6.getText() + "'
+7.delete from result where match_no = '" + jTextField6.getText() + "'
+8.select * from bowler_stats where player_id = ? && match_no = ?
+9.insert into bowler_stats values('"+jTextField5.getText()+"','" + jTextField8.getText()+ "','" +jTextField3.getText()+"','" +jTextField4.getText()+ "','" + jTextField1.getText()+"','"+jTextField6.getText()+"','" +jTextField7.getText()+"','" + jTextField2.getText() + "')
+10.update bowler_stats set overs = '" + jTextField3.getText()+ "', runs = '" + jTextField4.getText() + "',dots = '" + jTextField1.getText() + "',maidens = '" + jTextField6.getText() + "',wickets = '" +jTextField7.getText()+"',economy = '" +jTextField2.getText()+"' where player_id = '" + jTextField8.getText() +"' && match_no = '" + jTextField5.getText() + "'
+11.delete from bowler_stats where player_id = '" + jTextField8.getText() + "'&& match_no ='" + jTextField5.getText() +"'
+12.insert into fixtures values('"+jTextField5.getText()+"','" + jTextField7.getText()+ "','" +jTextField8.getText()+"','" +jTextField6.getText()+ "')
+13.update fixtures set vs = '" + jTextField7.getText()+ "', date = '" + jTextField8.getText() + "',venue = '" +jTextField6.getText()+"' where match_no = '" + jTextField5.getText() + "'
+14.delete from fixtures where match_no = '" + jTextField5.getText() + "'
+15.insert into Player_info values('"+jTextField5.getText()+"','" + jTextField3.getText()+"','" +jTextField8.getText()+"','" + "','" +jTextField4.getText()+"','" +jTextField1.getText()+ "','" + jTextField6.getText()+"','"+jTextField7.getText()+"','" + jTextField2.getText() + "')
+16.update Player_info set Fname = '" + jTextField3.getText()+"',Lname = '" + jTextField8.getText()+ "', age = '" + jTextField4.getText() + "',country = '" + jTextField1.getText() + "',jersey_no = '" + jTextField6.getText() + "',role = '" +jTextField7.getText()+"',Salary = '" +jTextField2.getText()+"' where player_id = '" + jTextField5.getText() + "'
+17.delete from Player_info where player_id = '" + jTextField5.getText() + "'
+18.select Fname,Lname,age,country,role,jersey_no from player_info where player_id = ?
+19.select result.*,fixtures.vs from result,fixtures where result.match_no = fixtures.match_no
+20.select result.*,fixtures.vs from result,fixtures where result.match_no = fixtures.match_no and result = 'w'
+21.select result.*,fixtures.vs from result,fixtures where result.match_no = fixtures.match_no and result = 'l'
+22.select * from fixtures
+23.select vs,date,venue from fixtures where match_no = '" +jTextField1.getText() + "'
+24.select match_no,vs,venue from fixtures where date = '" +jTextField2.getText() + "'
+25.select match_no,date,venue from fixtures where vs = '" +jTextField3.getText() + "'
+26.select match_no,vs,date from fixtures where venue = '" +jTextField4.getText() + "'
+27.select avg(economy) as Economy from bowler_stats where player_id = '" +jTextField1.getText() + "'
+28.select tot_overs,tot_runs,tot_dot,tot_maidens,tot_wickets from final_bowl_stats where player_id = '" +jTextField1.getText() + "'
+29.select max(wickets) as Highest_Wickets,match_no from bowler_stats where player_id = '" +jTextField1.getText() + "'
+30.select tot_runs,tot_balls,tot_fours,tot_sixes,Final_SR from final_bat_stats where player_id = '" +jTextField1.getText() + "'
+31.select avg(runs) as Average from batsman_stats where player_id = '" +jTextField1.getText() + "'
+32.select max(runs) as Highest_Score,match_no from batsman_stats where player_id = '" +jTextField1.getText() + "'
+
+Triggers:
+1.CREATE DEFINER=`root`@`localhost` TRIGGER `batsman_stats_AFTER_INSERT` AFTER INSERT ON `batsman_stats` FOR EACH ROW BEGIN
+call batsman();
+END
+2.CREATE DEFINER=`root`@`localhost` TRIGGER `batsman_stats_AFTER_UPDATE` AFTER UPDATE ON `batsman_stats` FOR EACH ROW BEGIN
+call batsman();
+END
+3.CREATE DEFINER=`root`@`localhost` TRIGGER `batsman_stats_AFTER_DELETE` AFTER DELETE ON `batsman_stats` FOR EACH ROW BEGIN
+call batsman();
+END
+4.CREATE DEFINER=`root`@`localhost` TRIGGER `bowler_stats_AFTER_INSERT` AFTER INSERT ON `bowler_stats` FOR EACH ROW BEGIN
+call bowler();
+END
+5.CREATE DEFINER=`root`@`localhost` TRIGGER `bowler_stats_AFTER_UPDATE` AFTER UPDATE ON `bowler_stats` FOR EACH ROW BEGIN
+call bowler();
+END
+6.CREATE DEFINER=`root`@`localhost` TRIGGER `bowler_stats_AFTER_DELETE` AFTER DELETE ON `bowler_stats` FOR EACH ROW BEGIN
+call bowler();
+END
+
+Stored Procedures:
+1.CREATE DEFINER=`root`@`localhost` PROCEDURE `batsman`()
+BEGIN
+
+update final_bat_stats
+set tot_runs = (select sum(runs) from batsman_stats where player_id = final_bat_stats.player_id),
+tot_balls = (select sum(balls) from batsman_stats where player_id = final_bat_stats.player_id),
+tot_fours = (select sum(fours) from batsman_stats where player_id = final_bat_stats.player_id),
+tot_sixes = (select sum(sixes) from batsman_stats where player_id = final_bat_stats.player_id),
+Final_SR = (select avg(Strike_rate) from batsman_stats where player_id = final_bat_stats.player_id)
+
+where player_id in (select player_id from batsman_stats group by player_id);
+
+
+
+
+END
+
+2.CREATE DEFINER=`root`@`localhost` PROCEDURE `bowler`()
+BEGIN
+update final_bowl_stats
+set tot_overs = (select sum(overs) from bowler_stats where player_id = final_bowl_stats.player_id),
+tot_runs = (select sum(runs) from bowler_stats where player_id = final_bowl_stats.player_id),
+tot_dot = (select sum(dots) from bowler_stats where player_id = final_bowl_stats.player_id),
+tot_maidens = (select sum(maidens) from bowler_stats where player_id = final_bowl_stats.player_id),
+tot_wickets = (select sum(wickets) from bowler_stats where player_id = final_bowl_stats.player_id),
+Feconomy = (select avg(economy) from bowler_stats where player_id = final_bowl_stats.player_id)
+where player_id in (select player_id from bowler_stats group by player_id);
+
+
+END
